@@ -7,9 +7,6 @@ import { Shield, ArrowLeft, Github, Crown, Users } from "lucide-react"
 import Link from "next/link"
 import { useAuth } from "@/components/auth-provider"
 
-// 强制动态渲染
-export const dynamic = "force-dynamic"
-
 export default function UnauthorizedPage() {
   const { user, logout } = useAuth()
 

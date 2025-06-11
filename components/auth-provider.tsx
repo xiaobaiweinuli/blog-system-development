@@ -1,24 +1,28 @@
 "use client"
 
 import type React from "react"
-
 import { createContext, useContext, useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 
 interface User {
   id: string
-  email: string
   name: string
+  email: string
   avatar: string
   role: "admin" | "user"
+  githubUsername: string
+  isRepoOwner: boolean
+  permissions: string[]
 }
 
 interface AuthContextType {
   user: User | null
-  isAuthenticated: boolean
-  isLoading: boolean
-  login: (token: string) => void
+  login: (redirectUrl?: string) => void
   logout: () => void
+  isLoading: boolean
+  hasPermission: (permission: string) => boolean
   isAdmin: () => boolean
+  isAuthenticated: () => boolean
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -26,48 +30,80 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const router = useRouter()
 
   useEffect(() => {
-    checkAuth()
+    checkAuthStatus()
   }, [])
 
-  const checkAuth = async () => {
+  const checkAuthStatus = async () => {
     try {
-      const response = await fetch("/api/auth/me")
+      const response = await fetch("/api/auth/me", {
+        credentials: "include",
+      })
+
       if (response.ok) {
         const userData = await response.json()
         setUser(userData)
+      } else {
+        setUser(null)
       }
     } catch (error) {
-      console.error("认证检查失败:", error)
+      console.error("Auth check failed:", error)
+      setUser(null)
     } finally {
       setIsLoading(false)
     }
   }
 
-  const login = (token: string) => {
-    // 设置 cookie 并重新检查认证状态
-    document.cookie = `auth_token=${token}; path=/; max-age=${7 * 24 * 60 * 60}` // 7天
-    checkAuth()
+  const login = (redirectUrl?: string) => {
+    const githubAuthUrl = new URL("https://github.com/login/oauth/authorize")
+    githubAuthUrl.searchParams.set("client_id", process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID || "Ov23li4W54qglDu0Oj90")
+    githubAuthUrl.searchParams.set("scope", "repo,read:org,read:user,user:email")
+    githubAuthUrl.searchParams.set("redirect_uri", `${window.location.origin}/api/auth/github`)
+
+    if (redirectUrl) {
+      githubAuthUrl.searchParams.set("state", redirectUrl)
+    }
+
+    window.location.href = githubAuthUrl.toString()
   }
 
-  const logout = () => {
-    document.cookie = "auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"
-    setUser(null)
-    window.location.href = "/"
+  const logout = async () => {
+    try {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      })
+      setUser(null)
+      router.push("/")
+    } catch (error) {
+      console.error("Logout failed:", error)
+    }
   }
 
-  const isAdmin = () => {
-    return user?.role === "admin"
+  const hasPermission = (permission: string): boolean => {
+    if (!user) return false
+    if (user.role === "admin") return true
+    return user.permissions.includes(permission)
   }
 
-  const value = {
+  const isAdmin = (): boolean => {
+    return user?.role === "admin" || false
+  }
+
+  const isAuthenticated = (): boolean => {
+    return user !== null
+  }
+
+  const value: AuthContextType = {
     user,
-    isAuthenticated: !!user,
-    isLoading,
     login,
     logout,
+    isLoading,
+    hasPermission,
     isAdmin,
+    isAuthenticated,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

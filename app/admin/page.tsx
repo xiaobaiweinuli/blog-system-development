@@ -24,9 +24,6 @@ import {
 import { useAuth } from "@/components/auth-provider"
 import { RoleGuard } from "@/components/role-guard"
 
-// 强制动态渲染，避免静态生成错误
-export const dynamic = "force-dynamic"
-
 // 模拟数据
 const mockPosts = [
   {
