@@ -1,28 +1,24 @@
 "use client"
 
 import type React from "react"
+
 import { createContext, useContext, useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
 
 interface User {
   id: string
-  name: string
   email: string
+  name: string
   avatar: string
   role: "admin" | "user"
-  githubUsername: string
-  isRepoOwner: boolean
-  permissions: string[]
 }
 
 interface AuthContextType {
   user: User | null
-  login: (redirectUrl?: string) => void
-  logout: () => void
+  isAuthenticated: boolean
   isLoading: boolean
-  hasPermission: (permission: string) => boolean
+  login: (token: string) => void
+  logout: () => void
   isAdmin: () => boolean
-  isAuthenticated: () => boolean
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -30,80 +26,48 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const router = useRouter()
 
   useEffect(() => {
-    checkAuthStatus()
+    checkAuth()
   }, [])
 
-  const checkAuthStatus = async () => {
+  const checkAuth = async () => {
     try {
-      const response = await fetch("/api/auth/me", {
-        credentials: "include",
-      })
-
+      const response = await fetch("/api/auth/me")
       if (response.ok) {
         const userData = await response.json()
         setUser(userData)
-      } else {
-        setUser(null)
       }
     } catch (error) {
-      console.error("Auth check failed:", error)
-      setUser(null)
+      console.error("认证检查失败:", error)
     } finally {
       setIsLoading(false)
     }
   }
 
-  const login = (redirectUrl?: string) => {
-    const githubAuthUrl = new URL("https://github.com/login/oauth/authorize")
-    githubAuthUrl.searchParams.set("client_id", "Ov23li4W54qglDu0Oj90")
-    githubAuthUrl.searchParams.set("scope", "repo,read:org,read:user,user:email")
-    githubAuthUrl.searchParams.set("redirect_uri", `${window.location.origin}/api/auth/github`)
-
-    if (redirectUrl) {
-      githubAuthUrl.searchParams.set("state", redirectUrl)
-    }
-
-    window.location.href = githubAuthUrl.toString()
+  const login = (token: string) => {
+    // 设置 cookie 并重新检查认证状态
+    document.cookie = `auth_token=${token}; path=/; max-age=${7 * 24 * 60 * 60}` // 7天
+    checkAuth()
   }
 
-  const logout = async () => {
-    try {
-      await fetch("/api/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      })
-      setUser(null)
-      router.push("/")
-    } catch (error) {
-      console.error("Logout failed:", error)
-    }
+  const logout = () => {
+    document.cookie = "auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"
+    setUser(null)
+    window.location.href = "/"
   }
 
-  const hasPermission = (permission: string): boolean => {
-    if (!user) return false
-    if (user.role === "admin") return true
-    return user.permissions.includes(permission)
+  const isAdmin = () => {
+    return user?.role === "admin"
   }
 
-  const isAdmin = (): boolean => {
-    return user?.role === "admin" || false
-  }
-
-  const isAuthenticated = (): boolean => {
-    return user !== null
-  }
-
-  const value: AuthContextType = {
+  const value = {
     user,
+    isAuthenticated: !!user,
+    isLoading,
     login,
     logout,
-    isLoading,
-    hasPermission,
     isAdmin,
-    isAuthenticated,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
@@ -112,7 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext)
   if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider")
+    throw new Error("useAuth 必须在 AuthProvider 内使用")
   }
   return context
 }

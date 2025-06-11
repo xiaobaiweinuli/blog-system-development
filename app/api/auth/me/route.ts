@@ -1,36 +1,29 @@
-import { NextResponse } from "next/server"
+import { type NextRequest, NextResponse } from "next/server"
 import { jwtVerify } from "jose"
-import { cookies } from "next/headers"
 
-const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || "your-secret-key")
+const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || "fallback-secret-key")
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const cookieStore = await cookies()
-    const token = cookieStore.get("auth_token")?.value
+    const token = request.cookies.get("auth_token")?.value
 
     if (!token) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
+      return NextResponse.json({ error: "未认证" }, { status: 401 })
     }
 
+    // 验证 JWT token
     const { payload } = await jwtVerify(token, JWT_SECRET)
     const user = payload as any
 
-    // 获取用户的详细信息
-    const userInfo = {
+    return NextResponse.json({
       id: user.id,
-      name: user.name,
       email: user.email,
+      name: user.name,
       avatar: user.avatar,
-      role: user.role,
-      githubUsername: user.githubUsername,
-      isRepoOwner: user.isRepoOwner,
-      permissions: user.permissions || [],
-    }
-
-    return NextResponse.json(userInfo)
+      role: user.role || "user",
+    })
   } catch (error) {
-    console.error("Auth verification failed:", error)
-    return NextResponse.json({ error: "Invalid token" }, { status: 401 })
+    console.error("认证验证失败:", error)
+    return NextResponse.json({ error: "认证失败" }, { status: 401 })
   }
 }

@@ -1,378 +1,248 @@
-"use client"
-
-import { useState } from "react"
+import { Suspense } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Search, Calendar, Clock, Tag, Edit, Plus, TrendingUp } from "lucide-react"
-import { useAuth } from "@/components/auth-provider"
-import { Header } from "@/components/layout/header"
-import { Footer } from "@/components/layout/footer"
+import { Calendar, User, ArrowRight, BookOpen, Github } from "lucide-react"
 
-// 模拟文章数据
+// 模拟博客文章数据
 const mockPosts = [
   {
     id: "1",
-    title: "如何搭建设计自己的博客网站？",
-    slug: "how-to-build-blog-website",
-    excerpt:
-      "博客是我一直以来都想拥有的东西，但一直没有找到合适的平台来写。因此，我自己动手，花了一些时间，终于把博客搭建起来了。",
-    content: "# 如何搭建设计自己的博客网站？\n\n博客是我一直以来都想拥有的东西...",
-    publishedAt: "2024-10-18",
-    tags: ["博客", "网站设计", "技术分享"],
-    author: "作者",
-    readingTime: 8,
-    views: 1234,
-    featured: true,
+    title: "欢迎使用我的博客系统",
+    excerpt: "这是一个基于 Next.js 和 GitHub 的现代化博客系统，支持 Markdown 编写和自动部署。",
+    author: "博主",
+    date: "2024-01-15",
+    tags: ["博客", "Next.js", "技术"],
+    readTime: "3 分钟",
   },
   {
     id: "2",
-    title: "Next.js 15 新特性详解",
-    slug: "nextjs-15-new-features",
-    excerpt: "深入了解 Next.js 15 带来的革命性变化，包括新的编译器、改进的性能和开发体验。",
-    content: "# Next.js 15 新特性详解\n\n这是一篇关于 Next.js 15 新特性的详细介绍...",
-    publishedAt: "2024-01-15",
-    tags: ["Next.js", "React", "前端开发"],
-    author: "作者",
-    readingTime: 6,
-    views: 856,
-    featured: false,
+    title: "如何配置 GitHub OAuth",
+    excerpt: "详细介绍如何设置 GitHub OAuth 应用，实现用户登录和权限管理功能。",
+    author: "博主",
+    date: "2024-01-14",
+    tags: ["GitHub", "OAuth", "认证"],
+    readTime: "5 分钟",
   },
   {
     id: "3",
-    title: "现代前端开发工具链",
-    slug: "modern-frontend-toolchain",
-    excerpt: "探索现代前端开发中必不可少的工具链，从构建工具到部署平台的完整指南。",
-    content: "# 现代前端开发工具链\n\n本文将介绍现代前端开发的工具链...",
-    publishedAt: "2024-01-12",
-    tags: ["前端", "工具", "开发"],
-    author: "作者",
-    readingTime: 10,
-    views: 642,
-    featured: false,
+    title: "Markdown 写作指南",
+    excerpt: "学习如何使用 Markdown 语法编写优美的博客文章，包括代码高亮、表格等高级功能。",
+    author: "博主",
+    date: "2024-01-13",
+    tags: ["Markdown", "写作", "教程"],
+    readTime: "4 分钟",
   },
 ]
 
-const mockStats = {
-  totalPosts: 12,
-  totalViews: 15420,
-  totalTags: 8,
+function PostCard({ post }: { post: (typeof mockPosts)[0] }) {
+  return (
+    <Card className="group hover:shadow-lg transition-all duration-300 border-l-4 border-l-purple-500">
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Calendar className="h-4 w-4" />
+            <span>{post.date}</span>
+            <span>•</span>
+            <User className="h-4 w-4" />
+            <span>{post.author}</span>
+            <span>•</span>
+            <BookOpen className="h-4 w-4" />
+            <span>{post.readTime}</span>
+          </div>
+        </div>
+        <CardTitle className="group-hover:text-purple-600 transition-colors">
+          <Link href={`/posts/${post.id}`} className="hover:underline">
+            {post.title}
+          </Link>
+        </CardTitle>
+        <CardDescription className="text-base leading-relaxed">{post.excerpt}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="flex items-center justify-between">
+          <div className="flex flex-wrap gap-2">
+            {post.tags.map((tag) => (
+              <Badge key={tag} variant="secondary" className="bg-purple-50 text-purple-700 hover:bg-purple-100">
+                {tag}
+              </Badge>
+            ))}
+          </div>
+          <Link href={`/posts/${post.id}`}>
+            <Button variant="ghost" size="sm" className="group/btn">
+              阅读更多
+              <ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
+            </Button>
+          </Link>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+function HeroSection() {
+  return (
+    <section className="py-20 px-4 text-center bg-gradient-to-br from-purple-50 to-blue-50">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+          我的博客
+        </h1>
+        <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
+          分享技术见解，记录学习历程，探索数字世界的无限可能
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link href="/posts">
+            <Button size="lg" className="bg-purple-600 hover:bg-purple-700">
+              <BookOpen className="mr-2 h-5 w-5" />
+              浏览文章
+            </Button>
+          </Link>
+          <Link href="/auth/login">
+            <Button size="lg" variant="outline" className="border-purple-200 hover:bg-purple-50">
+              <Github className="mr-2 h-5 w-5" />
+              GitHub 登录
+            </Button>
+          </Link>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function StatsSection() {
+  return (
+    <section className="py-16 px-4 bg-white">
+      <div className="max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+          <div className="p-6">
+            <div className="text-3xl font-bold text-purple-600 mb-2">50+</div>
+            <div className="text-muted-foreground">技术文章</div>
+          </div>
+          <div className="p-6">
+            <div className="text-3xl font-bold text-purple-600 mb-2">10K+</div>
+            <div className="text-muted-foreground">阅读量</div>
+          </div>
+          <div className="p-6">
+            <div className="text-3xl font-bold text-purple-600 mb-2">100+</div>
+            <div className="text-muted-foreground">GitHub Stars</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
 }
 
 export default function HomePage() {
-  const [posts, setPosts] = useState(mockPosts)
-  const [searchQuery, setSearchQuery] = useState("")
-  const [selectedTag, setSelectedTag] = useState("")
-  const { isAuthenticated, isAdmin } = useAuth()
-
-  // 获取所有标签
-  const allTags = Array.from(new Set(posts.flatMap((post) => post.tags)))
-
-  // 过滤文章
-  const filteredPosts = posts.filter((post) => {
-    const matchesSearch =
-      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.excerpt.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesTag = !selectedTag || post.tags.includes(selectedTag)
-    return matchesSearch && matchesTag
-  })
-
-  // 分离置顶文章
-  const featuredPosts = filteredPosts.filter((post) => post.featured)
-  const regularPosts = filteredPosts.filter((post) => !post.featured)
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-
-      {/* 主要内容区域 */}
-      <main className="max-w-6xl mx-auto px-4 py-8">
-        {/* 博客介绍 */}
-        <section className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">我的博客</h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">分享技术思考与生活感悟，记录成长路上的点点滴滴</p>
-
-          {/* 统计信息 */}
-          <div className="flex justify-center gap-8 mb-8">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">{mockStats.totalPosts}</div>
-              <div className="text-sm text-gray-600">篇文章</div>
+    <div className="min-h-screen bg-background">
+      {/* 导航栏 */}
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-16 items-center justify-between">
+          <Link href="/" className="flex items-center space-x-2">
+            <div className="h-8 w-8 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-sm">B</span>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">{mockStats.totalViews.toLocaleString()}</div>
-              <div className="text-sm text-gray-600">次阅读</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">{mockStats.totalTags}</div>
-              <div className="text-sm text-gray-600">个标签</div>
-            </div>
-          </div>
+            <span className="font-bold text-xl">我的博客</span>
+          </Link>
 
-          {/* 搜索框 */}
-          <div className="max-w-md mx-auto relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <Input
-              type="text"
-              placeholder="搜索文章..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 py-3 text-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
-            />
-          </div>
-        </section>
+          <nav className="flex items-center space-x-6">
+            <Link href="/posts" className="text-muted-foreground hover:text-foreground transition-colors">
+              文章
+            </Link>
+            <Link href="/about" className="text-muted-foreground hover:text-foreground transition-colors">
+              关于
+            </Link>
+            <Link href="/auth/login">
+              <Button variant="outline" size="sm">
+                <Github className="mr-2 h-4 w-4" />
+                登录
+              </Button>
+            </Link>
+          </nav>
+        </div>
+      </header>
 
-        {/* 管理员快捷操作 */}
-        {isAdmin() && (
-          <div className="mb-8 p-4 bg-purple-50 rounded-lg border border-purple-200 fade-in">
-            <div className="flex items-center justify-between">
+      {/* 主要内容 */}
+      <main>
+        <HeroSection />
+        <StatsSection />
+
+        {/* 最新文章 */}
+        <section className="py-16 px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex items-center justify-between mb-12">
               <div>
-                <h3 className="font-semibold text-purple-900">管理面板</h3>
-                <p className="text-sm text-purple-700">快速管理您的博客内容</p>
+                <h2 className="text-3xl font-bold mb-2">最新文章</h2>
+                <p className="text-muted-foreground">探索最新的技术见解和学习心得</p>
               </div>
-              <div className="flex gap-2">
-                <Button asChild size="sm" className="bg-purple-600 hover:bg-purple-700">
-                  <Link href="/admin/posts/new">
-                    <Plus className="w-4 h-4 mr-2" />
-                    写文章
-                  </Link>
+              <Link href="/posts">
+                <Button variant="outline">
+                  查看全部
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
-                <Button variant="outline" asChild size="sm">
-                  <Link href="/admin">
-                    <Edit className="w-4 h-4 mr-2" />
-                    管理后台
-                  </Link>
-                </Button>
-              </div>
+              </Link>
             </div>
-          </div>
-        )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* 主内容区 */}
-          <div className="lg:col-span-3 space-y-8">
-            {/* 标签过滤 */}
-            {allTags.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  variant={selectedTag === "" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSelectedTag("")}
-                  className={selectedTag === "" ? "bg-purple-600 hover:bg-purple-700" : ""}
-                >
-                  全部
-                </Button>
-                {allTags.map((tag) => (
-                  <Button
-                    key={tag}
-                    variant={selectedTag === tag ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setSelectedTag(tag)}
-                    className={selectedTag === tag ? "bg-purple-600 hover:bg-purple-700" : ""}
-                  >
-                    {tag}
-                  </Button>
+            <Suspense fallback={<div className="text-center py-8">加载中...</div>}>
+              <div className="grid gap-6">
+                {mockPosts.map((post) => (
+                  <PostCard key={post.id} post={post} />
                 ))}
               </div>
-            )}
-
-            {/* 置顶文章 */}
-            {featuredPosts.length > 0 && (
-              <section>
-                <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                  <TrendingUp className="w-6 h-6 text-purple-600" />
-                  精选文章
-                </h2>
-                <div className="space-y-6">
-                  {featuredPosts.map((post) => (
-                    <Card key={post.id} className="p-6 hover-lift border-l-4 border-l-purple-500">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-100">精选</Badge>
-                            <span className="text-sm text-gray-500 flex items-center gap-1">
-                              <Calendar className="w-4 h-4" />
-                              {post.publishedAt}
-                            </span>
-                          </div>
-                          <Link href={`/posts/${post.slug}`}>
-                            <h3 className="text-2xl font-bold text-gray-900 hover:text-purple-600 transition-colors mb-3">
-                              {post.title}
-                            </h3>
-                          </Link>
-                          <p className="text-gray-600 leading-relaxed mb-4">{post.excerpt}</p>
-                        </div>
-                        {isAdmin() && (
-                          <Button variant="ghost" size="sm" asChild>
-                            <Link href={`/admin/posts/${post.id}/edit`}>
-                              <Edit className="w-4 h-4" />
-                            </Link>
-                          </Button>
-                        )}
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4 text-sm text-gray-500">
-                          <span className="flex items-center gap-1">
-                            <Clock className="w-4 h-4" />
-                            {post.readingTime} 分钟阅读
-                          </span>
-                          <span>{post.views} 次阅读</span>
-                        </div>
-                        <div className="flex gap-2">
-                          {post.tags.slice(0, 3).map((tag) => (
-                            <Badge
-                              key={tag}
-                              variant="secondary"
-                              className="cursor-pointer hover:bg-purple-100"
-                              onClick={() => setSelectedTag(tag)}
-                            >
-                              <Tag className="w-3 h-3 mr-1" />
-                              {tag}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    </Card>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* 最新文章 */}
-            <section>
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                {featuredPosts.length > 0 ? "最新文章" : "所有文章"}
-              </h2>
-
-              {regularPosts.length === 0 ? (
-                <div className="text-center py-12">
-                  <p className="text-gray-500 text-lg">没有找到匹配的文章</p>
-                </div>
-              ) : (
-                <div className="space-y-6">
-                  {regularPosts.map((post) => (
-                    <Card key={post.id} className="p-6 hover-lift">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2 text-sm text-gray-500">
-                            <Calendar className="w-4 h-4" />
-                            <span>{post.publishedAt}</span>
-                            <span>•</span>
-                            <Clock className="w-4 h-4" />
-                            <span>{post.readingTime} 分钟阅读</span>
-                          </div>
-                          <Link href={`/posts/${post.slug}`}>
-                            <h3 className="text-xl font-bold text-gray-900 hover:text-purple-600 transition-colors mb-3">
-                              {post.title}
-                            </h3>
-                          </Link>
-                          <p className="text-gray-600 leading-relaxed mb-4">{post.excerpt}</p>
-                        </div>
-                        {isAdmin() && (
-                          <Button variant="ghost" size="sm" asChild>
-                            <Link href={`/admin/posts/${post.id}/edit`}>
-                              <Edit className="w-4 h-4" />
-                            </Link>
-                          </Button>
-                        )}
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <div className="text-sm text-gray-500">{post.views} 次阅读</div>
-                        <div className="flex gap-2">
-                          {post.tags.slice(0, 3).map((tag) => (
-                            <Badge
-                              key={tag}
-                              variant="secondary"
-                              className="cursor-pointer hover:bg-purple-100"
-                              onClick={() => setSelectedTag(tag)}
-                            >
-                              <Tag className="w-3 h-3 mr-1" />
-                              {tag}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </section>
+            </Suspense>
           </div>
-
-          {/* 侧边栏 */}
-          <div className="space-y-6">
-            {/* 关于我 */}
-            <Card className="p-6">
-              <h3 className="font-bold text-gray-900 mb-4">关于我</h3>
-              <div className="text-center mb-4">
-                <img
-                  src="/placeholder.svg?height=80&width=80"
-                  alt="头像"
-                  className="w-20 h-20 rounded-full mx-auto mb-3 border-4 border-purple-100"
-                />
-                <h4 className="font-semibold text-gray-900">博主</h4>
-                <p className="text-sm text-gray-600">前端开发工程师</p>
-              </div>
-              <p className="text-sm text-gray-600 leading-relaxed">
-                热爱技术，专注于前端开发和用户体验设计。喜欢分享技术心得和生活感悟。
-              </p>
-            </Card>
-
-            {/* 热门标签 */}
-            <Card className="p-6">
-              <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <Tag className="w-5 h-5 text-purple-600" />
-                热门标签
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {allTags.map((tag) => {
-                  const count = posts.filter((post) => post.tags.includes(tag)).length
-                  return (
-                    <Badge
-                      key={tag}
-                      variant={selectedTag === tag ? "default" : "secondary"}
-                      className={`cursor-pointer transition-colors ${
-                        selectedTag === tag ? "bg-purple-600 hover:bg-purple-700" : "hover:bg-purple-100"
-                      }`}
-                      onClick={() => setSelectedTag(selectedTag === tag ? "" : tag)}
-                    >
-                      {tag} ({count})
-                    </Badge>
-                  )
-                })}
-              </div>
-            </Card>
-
-            {/* 最新评论 */}
-            <Card className="p-6">
-              <h3 className="font-bold text-gray-900 mb-4">最新评论</h3>
-              <div className="space-y-3">
-                <div className="flex space-x-3">
-                  <img src="/placeholder.svg?height=32&width=32" alt="用户头像" className="w-8 h-8 rounded-full" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900">张三</p>
-                    <p className="text-xs text-gray-600 truncate">这篇文章写得很好，学到了很多...</p>
-                    <p className="text-xs text-gray-500">2 小时前</p>
-                  </div>
-                </div>
-                <div className="flex space-x-3">
-                  <img src="/placeholder.svg?height=32&width=32" alt="用户头像" className="w-8 h-8 rounded-full" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900">李四</p>
-                    <p className="text-xs text-gray-600 truncate">感谢分享，期待更多内容...</p>
-                    <p className="text-xs text-gray-500">1 天前</p>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          </div>
-        </div>
+        </section>
       </main>
 
-      <Footer />
+      {/* 页脚 */}
+      <footer className="border-t bg-muted/50 py-12">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+              <h3 className="font-semibold mb-4">关于博客</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                这是一个基于 Next.js 和 GitHub 的现代化博客系统，专注于技术分享和知识传播。
+              </p>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-4">快速链接</h3>
+              <ul className="space-y-2 text-sm">
+                <li>
+                  <Link href="/posts" className="text-muted-foreground hover:text-foreground">
+                    所有文章
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/tags" className="text-muted-foreground hover:text-foreground">
+                    标签
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/about" className="text-muted-foreground hover:text-foreground">
+                    关于我
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/contact" className="text-muted-foreground hover:text-foreground">
+                    联系方式
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-4">社交媒体</h3>
+              <div className="flex space-x-4">
+                <Link href="https://github.com" className="text-muted-foreground hover:text-foreground">
+                  <Github className="h-5 w-5" />
+                </Link>
+              </div>
+            </div>
+          </div>
+          <div className="border-t mt-8 pt-8 text-center text-sm text-muted-foreground">
+            <p>&copy; 2024 我的博客. 保留所有权利.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
