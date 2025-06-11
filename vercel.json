@@ -1,21 +1,5 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/next"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
-  ],
   "env": {
     "GITHUB_CLIENT_ID": "@github_client_id",
     "GITHUB_CLIENT_SECRET": "@github_client_secret",
@@ -26,7 +10,8 @@
     "CLOUDFLARE_R2_SECRET_ACCESS_KEY": "@cloudflare_r2_secret_access_key",
     "CLOUDFLARE_R2_BUCKET_NAME": "@cloudflare_r2_bucket_name",
     "NEXT_PUBLIC_SITE_URL": "@next_public_site_url",
-    "NEXT_PUBLIC_GITHUB_CLIENT_ID": "@next_public_github_client_id"
+    "NEXT_PUBLIC_GITHUB_CLIENT_ID": "@next_public_github_client_id",
+    "JWT_SECRET": "@jwt_secret"
   },
   "functions": {
     "app/api/**/*.ts": {

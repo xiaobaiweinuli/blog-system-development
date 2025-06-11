@@ -9,21 +9,26 @@ export async function GET(request: NextRequest) {
   const state = searchParams.get("state") // 重定向 URL
   const error = searchParams.get("error")
 
-  console.log("GitHub OAuth callback received:", { code: !!code, state, error })
+  console.log("GitHub OAuth 回调接收:", { code: !!code, state, error })
 
-  // Handle OAuth errors
+  // 处理 OAuth 错误
   if (error) {
-    console.error("GitHub OAuth error:", error)
+    console.error("GitHub OAuth 错误:", error)
     return NextResponse.redirect(new URL(`/auth/login?error=${error}`, request.url))
   }
 
   if (!code) {
-    console.error("No authorization code received")
+    console.error("未收到授权码")
     return NextResponse.redirect(new URL("/auth/login?error=no_code", request.url))
   }
 
   try {
-    console.log("Exchanging code for access token...")
+    console.log("正在交换授权码获取访问令牌...")
+
+    // 检查必需的环境变量
+    if (!process.env.GITHUB_CLIENT_ID || !process.env.GITHUB_CLIENT_SECRET) {
+      throw new Error("缺少 GitHub OAuth 配置。请检查 GITHUB_CLIENT_ID 和 GITHUB_CLIENT_SECRET 环境变量。")
+    }
 
     // 1. 交换 code 获取 access token
     const tokenResponse = await fetch("https://github.com/login/oauth/access_token", {
@@ -41,24 +46,24 @@ export async function GET(request: NextRequest) {
     })
 
     if (!tokenResponse.ok) {
-      throw new Error(`Token exchange failed: ${tokenResponse.status}`)
+      throw new Error(`令牌交换失败: ${tokenResponse.status}`)
     }
 
     const tokenData = await tokenResponse.json()
-    console.log("Token exchange response:", {
+    console.log("令牌交换响应:", {
       hasAccessToken: !!tokenData.access_token,
       error: tokenData.error,
     })
 
     if (tokenData.error) {
-      throw new Error(`GitHub OAuth error: ${tokenData.error_description || tokenData.error}`)
+      throw new Error(`GitHub OAuth 错误: ${tokenData.error_description || tokenData.error}`)
     }
 
     if (!tokenData.access_token) {
-      throw new Error("No access token received from GitHub")
+      throw new Error("未从 GitHub 收到访问令牌")
     }
 
-    console.log("Fetching user information...")
+    console.log("正在获取用户信息...")
 
     // 2. 获取用户信息
     const userResponse = await fetch("https://api.github.com/user", {
@@ -70,11 +75,11 @@ export async function GET(request: NextRequest) {
     })
 
     if (!userResponse.ok) {
-      throw new Error(`Failed to fetch user info: ${userResponse.status}`)
+      throw new Error(`获取用户信息失败: ${userResponse.status}`)
     }
 
     const userData = await userResponse.json()
-    console.log("User data received:", {
+    console.log("用户数据接收:", {
       login: userData.login,
       id: userData.id,
       name: userData.name,
@@ -84,7 +89,7 @@ export async function GET(request: NextRequest) {
     const repoOwner = process.env.GITHUB_REPO_OWNER
     const repoName = process.env.GITHUB_REPO_NAME
 
-    console.log("Checking permissions:", {
+    console.log("检查权限:", {
       userLogin: userData.login,
       repoOwner,
       repoName,
@@ -96,7 +101,7 @@ export async function GET(request: NextRequest) {
 
     // 检查是否为仓库所有者
     if (userData.login === repoOwner) {
-      console.log("User is repository owner - granting admin role")
+      console.log("用户是仓库所有者 - 授予管理员角色")
       userRole = "admin"
       isRepoOwner = true
       permissions = [
@@ -114,7 +119,7 @@ export async function GET(request: NextRequest) {
     } else if (repoOwner && repoName) {
       // 检查是否为协作者
       try {
-        console.log("Checking collaborator status...")
+        console.log("检查协作者状态...")
         const collaboratorResponse = await fetch(
           `https://api.github.com/repos/${repoOwner}/${repoName}/collaborators/${userData.login}`,
           {
@@ -127,13 +132,13 @@ export async function GET(request: NextRequest) {
         )
 
         if (collaboratorResponse.status === 204) {
-          console.log("User is collaborator - granting limited permissions")
+          console.log("用户是协作者 - 授予有限权限")
           permissions = ["read:posts", "write:posts", "manage:media"]
         } else {
-          console.log("User is not a collaborator - read-only access")
+          console.log("用户不是协作者 - 只读访问")
         }
       } catch (error) {
-        console.log("Error checking collaborator status:", error)
+        console.log("检查协作者状态时出错:", error)
       }
     }
 
@@ -155,7 +160,7 @@ export async function GET(request: NextRequest) {
           userEmail = primaryEmail?.email || emails[0]?.email
         }
       } catch (error) {
-        console.log("Could not fetch user email:", error)
+        console.log("无法获取用户邮箱:", error)
       }
     }
 
@@ -172,7 +177,7 @@ export async function GET(request: NextRequest) {
       githubToken: tokenData.access_token, // 存储用于后续 API 调用
     }
 
-    console.log("Creating JWT token for user:", {
+    console.log("为用户创建 JWT 令牌:", {
       id: user.id,
       role: user.role,
       permissions: user.permissions.length,
@@ -186,7 +191,7 @@ export async function GET(request: NextRequest) {
 
     // 6. 设置 cookie 并重定向
     const redirectUrl = state || (userRole === "admin" ? "/admin" : "/")
-    console.log("Redirecting to:", redirectUrl)
+    console.log("重定向到:", redirectUrl)
 
     const response = NextResponse.redirect(new URL(redirectUrl, request.url))
 
@@ -194,15 +199,15 @@ export async function GET(request: NextRequest) {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      maxAge: 60 * 60 * 24 * 7, // 7 天
       path: "/",
     })
 
     return response
   } catch (error) {
-    console.error("GitHub OAuth error:", error)
-    const errorMessage = error instanceof Error ? error.message : "Unknown error"
-    console.error("Full error details:", errorMessage)
+    console.error("GitHub OAuth 错误:", error)
+    const errorMessage = error instanceof Error ? error.message : "未知错误"
+    console.error("完整错误详情:", errorMessage)
 
     return NextResponse.redirect(
       new URL(`/auth/login?error=oauth_failed&details=${encodeURIComponent(errorMessage)}`, request.url),

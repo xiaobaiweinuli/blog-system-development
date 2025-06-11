@@ -9,45 +9,46 @@ function generateJWTSecret() {
 function createEnvFile() {
   const envPath = path.join(process.cwd(), ".env.local")
 
-  // Check if .env.local already exists
+  // 检查 .env.local 是否已存在
   if (fs.existsSync(envPath)) {
-    console.log("⚠️  .env.local already exists. Please update it manually.")
+    console.log("⚠️  .env.local 已存在。请手动更新。")
     return
   }
 
   const jwtSecret = generateJWTSecret()
 
-  const envContent = `# JWT Secret for token signing (auto-generated)
+  const envContent = `# JWT 密钥用于令牌签名（自动生成）
 JWT_SECRET=${jwtSecret}
 
-# GitHub OAuth for User Login
-# Get these from: https://github.com/settings/developers
-GITHUB_CLIENT_ID=your_github_client_id_here
-GITHUB_CLIENT_SECRET=your_github_client_secret_here
-NEXT_PUBLIC_GITHUB_CLIENT_ID=your_github_client_id_here
+# GitHub OAuth 用户登录配置
+# 从这里获取: https://github.com/settings/developers
+GITHUB_CLIENT_ID=你的_github_client_id
+GITHUB_CLIENT_SECRET=你的_github_client_secret
+NEXT_PUBLIC_GITHUB_CLIENT_ID=你的_github_client_id
 
-# Repository Information
-GITHUB_REPO_OWNER=your_github_username
-GITHUB_REPO_NAME=your_repository_name
+# 仓库信息
+GITHUB_REPO_OWNER=你的_github_用户名
+GITHUB_REPO_NAME=你的_仓库名称
 
-# Cloudflare R2 Storage
-CLOUDFLARE_ACCOUNT_ID=your_cloudflare_account_id
-CLOUDFLARE_R2_ACCESS_KEY_ID=your_r2_access_key
-CLOUDFLARE_R2_SECRET_ACCESS_KEY=your_r2_secret_key
-CLOUDFLARE_R2_BUCKET_NAME=your_bucket_name
+# Cloudflare R2 存储（可选）
+CLOUDFLARE_ACCOUNT_ID=你的_cloudflare_账户_id
+CLOUDFLARE_R2_ACCESS_KEY_ID=你的_r2_访问密钥
+CLOUDFLARE_R2_SECRET_ACCESS_KEY=你的_r2_密钥
+CLOUDFLARE_R2_BUCKET_NAME=你的_存储桶名称
 
-# Cloudflare Workers OAuth (for backend operations)
-CLOUDFLARE_GITHUB_CLIENT_ID=your_worker_github_client_id
-CLOUDFLARE_GITHUB_CLIENT_SECRET=your_worker_github_client_secret
+# Cloudflare Workers OAuth（用于后端操作，可选）
+CLOUDFLARE_GITHUB_CLIENT_ID=你的_worker_github_client_id
+CLOUDFLARE_GITHUB_CLIENT_SECRET=你的_worker_github_client_secret
 
-# Site Configuration
+# 站点配置
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 NODE_ENV=development
 `
 
   fs.writeFileSync(envPath, envContent)
-  console.log("✅ Created .env.local file with JWT secret")
-  console.log("📝 Please update the GitHub OAuth credentials and other settings")
+  console.log("✅ 已创建 .env.local 文件并生成 JWT 密钥")
+  console.log("📝 请更新 GitHub OAuth 凭据和其他设置")
+  console.log("📖 详细配置指南请参考 docs/SETUP_GUIDE.md")
 }
 
 function validateEnvironment() {
@@ -69,31 +70,31 @@ function validateEnvironment() {
   }
 
   if (missing.length > 0) {
-    console.log("❌ Missing required environment variables:")
+    console.log("❌ 缺少必需的环境变量:")
     missing.forEach((varName) => {
       console.log(`   - ${varName}`)
     })
     return false
   }
 
-  console.log("✅ All required environment variables are set")
+  console.log("✅ 所有必需的环境变量都已设置")
   return true
 }
 
 function main() {
-  console.log("🔧 Setting up environment...")
+  console.log("🔧 正在设置环境...")
 
-  // Create .env.local if it doesn't exist
+  // 如果不存在则创建 .env.local
   createEnvFile()
 
-  // Load environment variables
+  // 加载环境变量
   require("dotenv").config({ path: ".env.local" })
 
-  // Validate environment
+  // 验证环境
   const isValid = validateEnvironment()
 
   if (!isValid) {
-    console.log("\n📖 Please refer to docs/GITHUB_OAUTH_SETUP_GUIDE.md for detailed setup instructions")
+    console.log("\n📖 请参考 docs/SETUP_GUIDE.md 获取详细的设置说明")
   }
 }
 
