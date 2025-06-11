@@ -1,31 +1,54 @@
 # Vercel 部署指南
 
-## 🚀 快速部署步骤
+## 环境变量设置
 
-### 1. 准备环境变量
+在 Vercel 部署时，需要设置以下环境变量：
 
-在 Vercel 项目设置中添加以下环境变量：
+1. **GitHub 相关配置**
+   - `GITHUB_CLIENT_ID` - GitHub OAuth 应用的客户端 ID
+   - `GITHUB_CLIENT_SECRET` - GitHub OAuth 应用的客户端密钥
+   - `GITHUB_REPO_OWNER` - GitHub 仓库所有者用户名
+   - `GITHUB_REPO_NAME` - GitHub 仓库名称
+   - `NEXT_PUBLIC_GITHUB_CLIENT_ID` - 公开的 GitHub 客户端 ID（与 GITHUB_CLIENT_ID 相同）
 
-#### 必需的环境变量：
-\`\`\`
-GITHUB_CLIENT_ID=Ov23li4W54qglDu0Oj90
-GITHUB_CLIENT_SECRET=你的_github_client_secret
-NEXT_PUBLIC_GITHUB_CLIENT_ID=Ov23li4W54qglDu0Oj90
-GITHUB_REPO_OWNER=你的_github_用户名
-GITHUB_REPO_NAME=你的_仓库名称
-NEXT_PUBLIC_SITE_URL=https://你的域名.vercel.app
-JWT_SECRET=你的_jwt_密钥
-\`\`\`
+2. **Cloudflare 相关配置**（如果使用）
+   - `CLOUDFLARE_ACCOUNT_ID` - Cloudflare 账户 ID
+   - `CLOUDFLARE_R2_ACCESS_KEY_ID` - Cloudflare R2 访问密钥 ID
+   - `CLOUDFLARE_R2_SECRET_ACCESS_KEY` - Cloudflare R2 访问密钥
+   - `CLOUDFLARE_R2_BUCKET_NAME` - Cloudflare R2 存储桶名称
 
-#### 可选的环境变量（用于文件存储）：
-\`\`\`
-CLOUDFLARE_ACCOUNT_ID=你的_cloudflare_账户_id
-CLOUDFLARE_R2_ACCESS_KEY_ID=你的_r2_访问密钥
-CLOUDFLARE_R2_SECRET_ACCESS_KEY=你的_r2_密钥
-CLOUDFLARE_R2_BUCKET_NAME=你的_存储桶名称
-\`\`\`
+3. **其他必要配置**
+   - `NEXT_PUBLIC_SITE_URL` - 网站的公开 URL
+   - `JWT_SECRET` - 用于 JWT 令牌的密钥
 
-### 2. GitHub OAuth 应用设置
+## 部署步骤
+
+1. **Fork 或克隆仓库**
+   \`\`\`bash
+   git clone https://github.com/xiaobaiweinuli/blog-system-development.git
+   cd blog-system-development
+   \`\`\`
+
+2. **在 Vercel 上导入项目**
+   - 登录 Vercel 账户
+   - 点击 "Import Project"
+   - 选择 "Import Git Repository"
+   - 输入仓库 URL 或从列表中选择
+
+3. **配置项目**
+   - 项目名称：自定义或使用默认
+   - 框架预设：Next.js
+   - 根目录：./（默认）
+   - 构建命令：默认
+   - 输出目录：默认
+
+4. **添加环境变量**
+   - 在 Vercel 项目设置中添加上述所有环境变量
+
+5. **部署项目**
+   - 点击 "Deploy" 按钮
+
+## GitHub OAuth 应用设置
 
 1. 访问 [GitHub Developer Settings](https://github.com/settings/developers)
 2. 点击 "New OAuth App"
@@ -35,7 +58,7 @@ CLOUDFLARE_R2_BUCKET_NAME=你的_存储桶名称
    - **Authorization callback URL**: `https://你的域名.vercel.app/api/auth/github`
 4. 创建应用后，复制 Client ID 和 Client Secret
 
-### 3. 在 Vercel 中设置环境变量
+## 在 Vercel 中设置环境变量
 
 1. 进入你的 Vercel 项目仪表板
 2. 点击 "Settings" 标签
@@ -45,7 +68,7 @@ CLOUDFLARE_R2_BUCKET_NAME=你的_存储桶名称
    - **Value**: 变量值（如 `Ov23li4W54qglDu0Oj90`）
    - **Environment**: 选择 `Production`, `Preview`, 和 `Development`
 
-### 4. 生成 JWT 密钥
+## 生成 JWT 密钥
 
 如果你需要生成 JWT 密钥，可以使用以下方法：
 
@@ -63,14 +86,47 @@ console.log(crypto.randomBytes(32).toString('base64'));
 openssl rand -base64 32
 \`\`\`
 
-### 5. 部署项目
+## 常见问题排查
 
-1. 确保所有环境变量都已设置
-2. 推送代码到 GitHub
-3. Vercel 会自动部署
-4. 或者点击 Vercel 仪表板中的 "Deploy" 按钮
+### 部署失败
 
-### 6. 验证部署
+如果部署失败，请检查以下几点：
+
+1. **环境变量是否正确设置**
+   - 检查所有必需的环境变量是否已添加
+   - 确保没有拼写错误
+
+2. **GitHub OAuth 配置**
+   - 确保 GitHub OAuth 应用的回调 URL 设置为：
+     \`\`\`
+     https://你的域名.vercel.app/api/auth/github
+     \`\`\`
+
+3. **API 超时问题**
+   - 如果 API 请求超时，可以在项目设置中增加函数超时时间
+
+4. **构建错误**
+   - 检查构建日志以获取详细错误信息
+   - 确保所有依赖项都已正确安装
+
+## 更新部署
+
+当你对代码进行更改后，只需推送到 GitHub 仓库，Vercel 将自动重新部署。
+
+\`\`\`bash
+git add .
+git commit -m "更新内容"
+git push
+\`\`\`
+
+## 自定义域名设置
+
+1. 在 Vercel 项目设置中，转到 "Domains" 选项卡
+2. 添加你的自定义域名
+3. 按照 Vercel 提供的说明更新 DNS 记录
+4. 等待 DNS 传播（最多可能需要 48 小时）
+
+## 验证部署
 
 部署完成后：
 
@@ -102,13 +158,10 @@ https://你的域名.vercel.app/api/auth/github
 2. 确保 GitHub OAuth 应用有足够的权限
 3. 检查仓库是否为公开或已授权访问
 
-## 📞 获取帮助
+## 需要帮助？
 
-如果遇到问题：
-1. 检查 Vercel 部署日志
-2. 查看浏览器控制台错误
-3. 确认所有环境变量都已正确设置
-4. 参考 GitHub OAuth 设置指南
+如果你在部署过程中遇到任何问题，请查看 Vercel 的官方文档或联系支持团队。
+\`\`\`
 
 ## 🎉 部署成功！
 
