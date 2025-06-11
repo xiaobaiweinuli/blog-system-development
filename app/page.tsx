@@ -1,7 +1,3 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-
 export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-100">
@@ -11,24 +7,24 @@ export default function Home() {
           <nav>
             <ul className="flex space-x-4">
               <li>
-                <Link href="/" className="text-purple-700 hover:text-purple-900">
+                <a href="/" className="text-purple-700 hover:text-purple-900">
                   首页
-                </Link>
+                </a>
               </li>
               <li>
-                <Link href="/posts" className="text-gray-600 hover:text-purple-700">
+                <a href="/posts" className="text-gray-600 hover:text-purple-700">
                   文章
-                </Link>
+                </a>
               </li>
               <li>
-                <Link href="/about" className="text-gray-600 hover:text-purple-700">
+                <a href="/about" className="text-gray-600 hover:text-purple-700">
                   关于
-                </Link>
+                </a>
               </li>
               <li>
-                <Link href="/auth/login" className="text-gray-600 hover:text-purple-700">
+                <a href="/auth/login" className="text-gray-600 hover:text-purple-700">
                   登录
-                </Link>
+                </a>
               </li>
             </ul>
           </nav>
@@ -42,48 +38,37 @@ export default function Home() {
             这是一个基于 Next.js 和 GitHub 的现代化博客系统，专注于内容创作与分享。
           </p>
           <div className="mt-8">
-            <Link href="/posts">
-              <Button className="bg-purple-600 hover:bg-purple-700">浏览文章</Button>
-            </Link>
+            <a href="/posts" className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-md">
+              浏览文章
+            </a>
           </div>
         </section>
 
         <section className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
-          <Card>
-            <CardHeader>
-              <CardTitle>简洁设计</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>专注于内容展示的简洁设计，让读者能够更好地沉浸在阅读体验中。</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>GitHub 集成</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>与 GitHub 深度集成，利用 GitHub 的强大功能进行内容管理和版本控制。</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>响应式设计</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>完全响应式的设计，在任何设备上都能提供出色的阅读体验。</p>
-            </CardContent>
-          </Card>
+          <div className="bg-white p-6 rounded-lg shadow-sm">
+            <h3 className="text-xl font-bold mb-2">简洁设计</h3>
+            <p>专注于内容展示的简洁设计，让读者能够更好地沉浸在阅读体验中。</p>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-sm">
+            <h3 className="text-xl font-bold mb-2">GitHub 集成</h3>
+            <p>与 GitHub 深度集成，利用 GitHub 的强大功能进行内容管理和版本控制。</p>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-sm">
+            <h3 className="text-xl font-bold mb-2">响应式设计</h3>
+            <p>完全响应式的设计，在任何设备上都能提供出色的阅读体验。</p>
+          </div>
         </section>
 
         <section className="bg-purple-50 p-8 rounded-lg">
           <h2 className="text-2xl font-bold mb-4 text-center text-purple-800">开始使用</h2>
           <p className="text-center mb-6">只需几个简单的步骤，即可开始使用这个强大的博客系统。</p>
           <div className="flex justify-center">
-            <Link href="/auth/login">
-              <Button variant="outline" className="border-purple-600 text-purple-600 hover:bg-purple-100">
-                立即登录
-              </Button>
-            </Link>
+            <a
+              href="/auth/login"
+              className="border border-purple-600 text-purple-600 hover:bg-purple-100 px-6 py-2 rounded-md"
+            >
+              立即登录
+            </a>
           </div>
         </section>
       </main>
