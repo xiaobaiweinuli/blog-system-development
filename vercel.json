@@ -1,0 +1,72 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ],
+  "env": {
+    "GITHUB_CLIENT_ID": "@github_client_id",
+    "GITHUB_CLIENT_SECRET": "@github_client_secret",
+    "GITHUB_REPO_OWNER": "@github_repo_owner",
+    "GITHUB_REPO_NAME": "@github_repo_name",
+    "CLOUDFLARE_ACCOUNT_ID": "@cloudflare_account_id",
+    "CLOUDFLARE_R2_ACCESS_KEY_ID": "@cloudflare_r2_access_key_id",
+    "CLOUDFLARE_R2_SECRET_ACCESS_KEY": "@cloudflare_r2_secret_access_key",
+    "CLOUDFLARE_R2_BUCKET_NAME": "@cloudflare_r2_bucket_name",
+    "NEXT_PUBLIC_SITE_URL": "@next_public_site_url",
+    "NEXT_PUBLIC_GITHUB_CLIENT_ID": "@next_public_github_client_id"
+  },
+  "functions": {
+    "app/api/**/*.ts": {
+      "maxDuration": 30
+    }
+  },
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/admin",
+      "destination": "/admin/",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api/sitemap"
+    },
+    {
+      "source": "/robots.txt",
+      "destination": "/api/robots"
+    }
+  ]
+}
