@@ -1,18 +1,5 @@
 {
   "version": 2,
-  "env": {
-    "GITHUB_CLIENT_ID": "@github_client_id",
-    "GITHUB_CLIENT_SECRET": "@github_client_secret",
-    "GITHUB_REPO_OWNER": "@github_repo_owner",
-    "GITHUB_REPO_NAME": "@github_repo_name",
-    "CLOUDFLARE_ACCOUNT_ID": "@cloudflare_account_id",
-    "CLOUDFLARE_R2_ACCESS_KEY_ID": "@cloudflare_r2_access_key_id",
-    "CLOUDFLARE_R2_SECRET_ACCESS_KEY": "@cloudflare_r2_secret_access_key",
-    "CLOUDFLARE_R2_BUCKET_NAME": "@cloudflare_r2_bucket_name",
-    "NEXT_PUBLIC_SITE_URL": "@next_public_site_url",
-    "NEXT_PUBLIC_GITHUB_CLIENT_ID": "@next_public_github_client_id",
-    "JWT_SECRET": "@jwt_secret"
-  },
   "functions": {
     "app/api/**/*.ts": {
       "maxDuration": 30
