@@ -1,28 +1,18 @@
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-100">
-      <header className="container mx-auto py-6 px-4">
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-purple-700">我的博客</h1>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <header className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-gray-900">博客系统</h1>
           <nav>
             <ul className="flex space-x-4">
               <li>
-                <a href="/" className="text-purple-700 hover:text-purple-900">
+                <a href="/" className="text-purple-600 hover:text-purple-800">
                   首页
                 </a>
               </li>
               <li>
-                <a href="/posts" className="text-gray-600 hover:text-purple-700">
-                  文章
-                </a>
-              </li>
-              <li>
-                <a href="/about" className="text-gray-600 hover:text-purple-700">
-                  关于
-                </a>
-              </li>
-              <li>
-                <a href="/auth/login" className="text-gray-600 hover:text-purple-700">
+                <a href="/auth/login" className="text-gray-600 hover:text-gray-800">
                   登录
                 </a>
               </li>
@@ -31,59 +21,34 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="container mx-auto py-12 px-4">
-        <section className="text-center mb-16">
-          <h2 className="text-4xl font-bold mb-4 text-purple-800">欢迎来到我的博客</h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            这是一个基于 Next.js 和 GitHub 的现代化博客系统，专注于内容创作与分享。
-          </p>
-          <div className="mt-8">
-            <a href="/posts" className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-md">
-              浏览文章
-            </a>
+      <main className="flex-grow">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">欢迎使用博客系统</h2>
+            <p className="mt-4 text-lg text-gray-600">一个简单、高效的博客管理系统</p>
           </div>
-        </section>
 
-        <section className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
-          <div className="bg-white p-6 rounded-lg shadow-sm">
-            <h3 className="text-xl font-bold mb-2">简洁设计</h3>
-            <p>专注于内容展示的简洁设计，让读者能够更好地沉浸在阅读体验中。</p>
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="bg-white overflow-hidden shadow rounded-lg">
+                <div className="p-6">
+                  <h3 className="text-lg font-medium text-gray-900">示例文章 {i}</h3>
+                  <p className="mt-2 text-gray-600">这是一篇示例文章的摘要，展示了博客系统的基本功能和设计。</p>
+                  <div className="mt-4">
+                    <a href="#" className="text-purple-600 hover:text-purple-800">
+                      阅读更多 &rarr;
+                    </a>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="bg-white p-6 rounded-lg shadow-sm">
-            <h3 className="text-xl font-bold mb-2">GitHub 集成</h3>
-            <p>与 GitHub 深度集成，利用 GitHub 的强大功能进行内容管理和版本控制。</p>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow-sm">
-            <h3 className="text-xl font-bold mb-2">响应式设计</h3>
-            <p>完全响应式的设计，在任何设备上都能提供出色的阅读体验。</p>
-          </div>
-        </section>
-
-        <section className="bg-purple-50 p-8 rounded-lg">
-          <h2 className="text-2xl font-bold mb-4 text-center text-purple-800">开始使用</h2>
-          <p className="text-center mb-6">只需几个简单的步骤，即可开始使用这个强大的博客系统。</p>
-          <div className="flex justify-center">
-            <a
-              href="/auth/login"
-              className="border border-purple-600 text-purple-600 hover:bg-purple-100 px-6 py-2 rounded-md"
-            >
-              立即登录
-            </a>
-          </div>
-        </section>
+        </div>
       </main>
 
-      <footer className="bg-gray-800 text-white py-8">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="mb-4 md:mb-0">
-              <h3 className="text-xl font-bold">我的博客</h3>
-              <p className="text-gray-300">基于 Next.js 和 GitHub 的现代化博客系统</p>
-            </div>
-            <div>
-              <p>&copy; {new Date().getFullYear()} 我的博客. 保留所有权利.</p>
-            </div>
-          </div>
+      <footer className="bg-white border-t border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <p className="text-center text-gray-500">&copy; 2025 博客系统. 保留所有权利.</p>
         </div>
       </footer>
     </div>
