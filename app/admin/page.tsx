@@ -93,6 +93,62 @@ export default function AdminDashboard() {
 
   return (
     <RoleGuard requiredRole="admin" redirectTo="/unauthorized">
+      {/* <div className="min-h-screen bg-gray-50">
+        <header className="bg-white shadow">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 className="text-2xl font-bold text-gray-900">管理面板</h1>
+          </div>
+        </header>
+
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="bg-white overflow-hidden shadow rounded-lg">
+              <div className="p-6">
+                <h3 className="text-lg font-medium text-gray-900">文章管理</h3>
+                <p className="mt-2 text-gray-600">创建、编辑和管理博客文章</p>
+                <div className="mt-4">
+                  <a href="/admin/posts" className="text-purple-600 hover:text-purple-800">
+                    管理文章 &rarr;
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white overflow-hidden shadow rounded-lg">
+              <div className="p-6">
+                <h3 className="text-lg font-medium text-gray-900">媒体管理</h3>
+                <p className="mt-2 text-gray-600">上传和管理图片、文件</p>
+                <div className="mt-4">
+                  <a href="/admin/media" className="text-purple-600 hover:text-purple-800">
+                    管理媒体 &rarr;
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white overflow-hidden shadow rounded-lg">
+              <div className="p-6">
+                <h3 className="text-lg font-medium text-gray-900">系统设置</h3>
+                <p className="mt-2 text-gray-600">配置博客系统设置</p>
+                <div className="mt-4">
+                  <a href="/admin/settings" className="text-purple-600 hover:text-purple-800">
+                    系统设置 &rarr;
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-8">
+            <a
+              href="/"
+              className="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-md"
+            >
+              返回首页
+            </a>
+          </div>
+        </main>
+      </div> */}
       <div className="min-h-screen bg-gray-50">
         {/* 顶部导航 */}
         <div className="bg-white border-b border-gray-200">

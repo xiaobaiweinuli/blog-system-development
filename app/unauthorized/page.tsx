@@ -1,128 +1,51 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Shield, ArrowLeft, Github, Crown, Users } from "lucide-react"
-import Link from "next/link"
-import { useAuth } from "@/components/auth-provider"
-
 export default function UnauthorizedPage() {
-  const { user, logout } = useAuth()
-
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="w-full max-w-2xl space-y-6">
-        <div className="text-center">
-          <Shield className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h1 className="text-3xl font-bold text-red-600">访问被拒绝</h1>
-          <p className="text-muted-foreground mt-2">您没有权限访问此页面</p>
-        </div>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-md text-center">
+        <div className="bg-white shadow rounded-lg p-8">
+          <div className="mb-6">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+                />
+              </svg>
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">访问被拒绝</h1>
+            <p className="text-gray-600">您没有权限访问此页面</p>
+          </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="w-5 h-5" />
-              权限说明
-            </CardTitle>
-            <CardDescription>了解不同用户角色的访问权限</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Alert>
-              <AlertDescription>
-                此博客系统使用基于 GitHub 仓库的权限控制。您的访问级别取决于您在 GitHub 仓库中的角色。
-              </AlertDescription>
-            </Alert>
-
-            <div className="grid gap-4 md:grid-cols-3">
-              <div className="border rounded-lg p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <Crown className="w-5 h-5 text-yellow-500" />
-                  <h3 className="font-semibold">仓库所有者</h3>
-                </div>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• 完整管理员权限</li>
-                  <li>• 管理所有内容</li>
-                  <li>• 系统设置配置</li>
-                  <li>• 用户权限管理</li>
-                </ul>
-              </div>
-
-              <div className="border rounded-lg p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <Users className="w-5 h-5 text-blue-500" />
-                  <h3 className="font-semibold">协作者</h3>
-                </div>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• 创建和编辑文章</li>
-                  <li>• 管理媒体文件</li>
-                  <li>• 查看基础分析</li>
-                  <li>• 有限的系统访问</li>
-                </ul>
-              </div>
-
-              <div className="border rounded-lg p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <Github className="w-5 h-5 text-gray-500" />
-                  <h3 className="font-semibold">其他用户</h3>
-                </div>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• 查看公开文章</li>
-                  <li>• 阅读博客内容</li>
-                  <li>• 无管理权限</li>
-                  <li>• 只读访问</li>
-                </ul>
-              </div>
+          <div className="space-y-4">
+            <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
+              <h3 className="font-medium text-yellow-800 mb-2">权限说明</h3>
+              <ul className="text-sm text-yellow-700 space-y-1">
+                <li>• 仓库所有者：完整管理员权限</li>
+                <li>• 协作者：内容创建和编辑权限</li>
+                <li>• 其他用户：只读访问权限</li>
+              </ul>
             </div>
 
-            {user && (
-              <Alert>
-                <AlertDescription>
-                  <strong>当前用户：</strong> {user.name} (@{user.githubUsername})
-                  <br />
-                  <strong>角色：</strong> {user.role === "admin" ? "管理员" : "普通用户"}
-                  <br />
-                  <strong>权限：</strong> {user.permissions.join(", ")}
-                </AlertDescription>
-              </Alert>
-            )}
-          </CardContent>
-        </Card>
-
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button variant="outline" asChild>
-            <Link href="/">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              返回首页
-            </Link>
-          </Button>
-
-          {user && (
-            <Button variant="outline" onClick={logout}>
-              <Github className="w-4 h-4 mr-2" />
-              切换账户
-            </Button>
-          )}
-
-          <Button asChild>
-            <Link href="/auth/login">重新登录</Link>
-          </Button>
-        </div>
-
-        <Card className="border-yellow-200 bg-yellow-50">
-          <CardContent className="pt-6">
-            <h3 className="font-semibold mb-2">需要访问权限？</h3>
-            <p className="text-sm text-muted-foreground mb-3">
-              如果您需要管理此博客的权限，请联系仓库所有者将您添加为协作者。
-            </p>
-            <div className="text-xs text-muted-foreground">
-              <p>仓库所有者可以在 GitHub 仓库设置中添加协作者：</p>
-              <p className="font-mono bg-white px-2 py-1 rounded mt-1">
-                Settings → Manage access → Invite a collaborator
-              </p>
+            <div className="space-y-2">
+              <a
+                href="/"
+                className="block w-full py-2 px-4 bg-purple-600 hover:bg-purple-700 text-white rounded-md transition-colors"
+              >
+                返回首页
+              </a>
+              <a
+                href="/auth/login"
+                className="block w-full py-2 px-4 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-md transition-colors"
+              >
+                重新登录
+              </a>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   )
